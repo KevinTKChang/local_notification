@@ -354,6 +354,9 @@ public class FlutterLocalNotificationsPlugin implements MethodCallHandler, Plugi
                 getBroadcastPendingIntent(context, notificationDetails.id, notificationIntent);
         AlarmManager alarmManager = getAlarmManager(context);
         long epochMilli = VERSION.SDK_INT >= VERSION_CODES.O ? ZonedDateTime.of(LocalDateTime.parse(notificationDetails.scheduledDateTime), ZoneId.of(notificationDetails.timeZoneName)).toInstant().toEpochMilli() : org.threeten.bp.ZonedDateTime.of(org.threeten.bp.LocalDateTime.parse(notificationDetails.scheduledDateTime), org.threeten.bp.ZoneId.of(notificationDetails.timeZoneName)).toInstant().toEpochMilli();
+        if (VERSION.SDK_INT >= VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) {
+            return;
+        }
         if (BooleanUtils.getValue(notificationDetails.allowWhileIdle)) {
             AlarmManagerCompat.setExactAndAllowWhileIdle(alarmManager, AlarmManager.RTC_WAKEUP, epochMilli, pendingIntent);
         } else {
